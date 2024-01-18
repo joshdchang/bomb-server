@@ -152,7 +152,8 @@ app.get("/", async (c) => {
           No bombs have been created yet.
         </div>
       )}
-    </>
+    </>,
+    { title: "CPSC 323 | Bomb Lab Scoreboard" }
   );
 });
 

@@ -17,7 +17,6 @@ export const renderer = jsxRenderer(
           <title>{title}</title>
           <meta charSet="utf-8" />
           <meta name="viewport" content="width=device-width, initial-scale=1" />
-          <link rel="manifest" href="/manifest.json" />
         </head>
         <body lang="en" class="bg-slate-800 font-mono">
           {children}
