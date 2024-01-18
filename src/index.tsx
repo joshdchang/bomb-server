@@ -1,0 +1,324 @@
+import { Hono } from "hono";
+import { renderer } from "./renderer";
+import { drizzle } from "drizzle-orm/d1";
+import * as schema from "./schema";
+import { HTTPException } from "hono/http-exception";
+import { and, eq, sql } from "drizzle-orm";
+
+type Bindings = {
+  DB: D1Database;
+};
+
+const app = new Hono<{ Bindings: Bindings }>();
+
+app.get("*", renderer);
+
+app.get("/", async (c) => {
+  const db = drizzle(c.env.DB, { schema });
+
+  const bombs = await db.query.bombs.findMany({
+    orderBy: (bombs, { desc, asc }) => [desc(bombs.score), asc(bombs.time)],
+  });
+
+  const first = bombs[0] as schema.Bomb | undefined;
+  const second = bombs[1] as schema.Bomb | undefined;
+  const third = bombs[2] as schema.Bomb | undefined;
+
+  return c.render(
+    <>
+      {/* header */}
+      <div class="flex items-center justify-between bg-slate-100 px-16 py-10">
+        <div class="grid gap-3">
+          <h2 class="flex items-center gap-3 text-lg font-medium">
+            <span class="text-slate-600">CPSC 323</span>
+            <div class="h-5 w-0.5 rounded-full bg-slate-300"></div>
+            <span class="text-rose-600">Bomb Lab</span>
+          </h2>
+          <h1 class="font-mono text-3xl font-bold text-slate-900">
+            Scoreboard
+          </h1>
+        </div>
+        <div class="w-1/2 leading-normal text-slate-600">
+          This page contains the latest information that we have received from
+          your bomb. If you have any questions, please contact the course staff
+          at{" "}
+          <a
+            href="mailto:example@example.com"
+            class="text-blue-500 underline underline-offset-2 hover:text-blue-600"
+          >
+            example@example.com
+          </a>
+          .
+        </div>
+      </div>
+      {/* podium */}
+      <div class="grid grid-cols-3 items-end gap-12 p-16">
+        {/* second */}
+        <div class="grid h-44 grid-cols-[1fr_2fr] overflow-hidden rounded bg-slate-900">
+          <div class="flex items-center justify-center bg-rose-500/80 text-5xl font-bold text-slate-50">
+            2
+          </div>
+          <div class="flex items-center justify-center text-2xl text-slate-100">
+            {second ? "bomb" + second.id : "--"}
+          </div>
+        </div>
+        {/* first */}
+        <div class="grid h-60 grid-cols-[1fr_2fr] overflow-hidden rounded bg-slate-900">
+          <div class="flex items-center justify-center bg-rose-500/80 text-5xl font-bold text-slate-50">
+            1
+          </div>
+          <div class="flex items-center justify-center text-2xl text-slate-100">
+            {first ? "bomb" + first.id : "--"}
+          </div>
+        </div>
+        {/* third */}
+        <div class="grid h-32 grid-cols-[1fr_2fr] overflow-hidden rounded bg-slate-900">
+          <div class="flex items-center justify-center bg-rose-500/80 text-5xl font-bold text-slate-50">
+            3
+          </div>
+          <div class="flex items-center justify-center text-2xl text-slate-100">
+            {third ? "bomb" + third.id : "--"}
+          </div>
+        </div>
+      </div>
+      {/* results */}
+      {bombs.length > 0 ? (
+        <div class="grid gap-2 px-16 pb-16 pt-4">
+          <div class="flex items-center justify-between gap-3 px-1 text-lg text-slate-50">
+            <div class="grid grid-cols-[6rem_9rem_9rem_12rem_16rem] items-center">
+              <div class="text-2xl font-medium text-slate-600">#</div>
+              <div class="text-lg font-medium text-slate-600">Bomb</div>
+              <div class="text-lg font-medium text-slate-600">Phase</div>
+              <div class="text-lg font-medium text-slate-600">Explosions</div>
+              <div class="text-lg font-medium text-slate-600">
+                Submission Time
+              </div>
+            </div>
+            <div class="flex items-center gap-4">
+              <div class="text-lg font-medium text-slate-600">Score</div>
+            </div>
+          </div>
+          <div class="h-px w-full rounded-lg bg-slate-700"></div>
+          {bombs.map((bomb, index) => (
+            <>
+              <div
+                id={"bomb" + bomb.id}
+                class="flex items-center justify-between gap-3 px-1 py-1 text-lg text-slate-50"
+              >
+                <div class="grid grid-cols-[6rem_9rem_9rem_12rem_16rem] items-center">
+                  <div class="text-3xl font-bold text-slate-500">
+                    {index + 1}
+                  </div>
+                  <div>bomb{bomb.id}</div>
+                  <div class="flex items-center gap-1 font-medium">
+                    {bomb.phase === 10 ? (
+                      <span class="text-green-400">10</span>
+                    ) : (
+                      <span class="text-blue-400">{bomb.phase}</span>
+                    )}
+                    <span class="text-slate-600">/</span>
+                    <span class="text-slate-600">10</span>
+                  </div>
+                  {bomb.explosions === 0 ? (
+                    <div class="font-medium text-slate-600">None</div>
+                  ) : (
+                    <div class="font-medium text-pink-400">
+                      {bomb.explosions}
+                    </div>
+                  )}
+                  <div class="text-base text-slate-400">
+                    {bomb.time.toLocaleString("en-US", {
+                      day: "numeric",
+                      month: "short",
+                      hour12: true,
+                      hour: "numeric",
+                      minute: "numeric",
+                      timeZone: "America/New_York",
+                    })}
+                  </div>
+                </div>
+                <div class="flex items-center gap-4">
+                  <div class="text-xl font-bold text-rose-500">
+                    {bomb.score}
+                  </div>
+                </div>
+              </div>
+              <div class="h-px w-full rounded-lg bg-slate-700"></div>
+            </>
+          ))}
+        </div>
+      ) : (
+        <div class="flex h-32 items-center justify-center text-2xl font-medium text-slate-400">
+          No bombs have been created yet.
+        </div>
+      )}
+    </>
+  );
+});
+
+app.get("/submit", async (c) => {
+  const { searchParams } = new URL(c.req.url);
+  const netId = searchParams.get("netId");
+  const result = searchParams.get("result");
+
+  if (!netId || !result) {
+    throw new HTTPException(400, { message: "Missing parameters" });
+  }
+
+  const db = drizzle(c.env.DB, { schema });
+
+  const pieces = result.split(":");
+
+  if (pieces.length !== 4) {
+    throw new HTTPException(400, { message: "Invalid result" });
+  }
+
+  const [bombIdStr, action, phaseStr, response] = pieces;
+  const bombId = parseInt(bombIdStr);
+  const phase = parseInt(phaseStr);
+
+  const current = await db.query.bombs.findFirst({
+    where: (bombs, { eq }) => eq(bombs.id, bombId),
+  });
+
+  if (!current) {
+    throw new HTTPException(400, { message: "Invalid bombId" });
+  }
+  if (current.netId !== netId) {
+    throw new HTTPException(400, { message: "Invalid netId" });
+  }
+
+  if (action === "defused") {
+    if (!response) {
+      throw new HTTPException(400, { message: "Missing response" });
+    }
+
+    if (phase !== current.phase + 1) {
+      throw new HTTPException(400, { message: "Invalid phase" });
+    }
+
+    await db
+      .update(schema.bombs)
+      .set({
+        phase,
+        time: new Date(),
+        score: phase * 10 + current.explosions * -0.5,
+      })
+      .where(eq(schema.bombs.id, bombId));
+
+    await db.insert(schema.defuses).values({
+      bombId,
+      response,
+      phase,
+    });
+
+    return c.text("OK");
+  } else if (action === "exploded") {
+    await db
+      .update(schema.bombs)
+      .set({
+        explosions: current.explosions + 1,
+        score: current.phase * 10 + (current.explosions + 1) * -0.5,
+        time: new Date(),
+      })
+      .where(eq(schema.bombs.id, bombId));
+
+    await db.insert(schema.explosions).values({
+      bombId,
+      phase,
+      response,
+    });
+
+    return c.text("OK");
+  } else {
+    throw new HTTPException(400, { message: "Invalid action" });
+  }
+});
+
+app.all("/ping", (c) => c.text("pong"));
+
+app.post("/create", async (c) => {
+  const { searchParams } = new URL(c.req.url);
+  const netId = searchParams.get("netId");
+  if (!netId) {
+    throw new HTTPException(400, { message: "Missing netId" });
+  }
+
+  const db = drizzle(c.env.DB, { schema });
+  const res = await db
+    .insert(schema.bombs)
+    .values({ netId })
+    .returning({ id: schema.bombs.id })
+    .get();
+
+  return c.text(res.id.toString());
+});
+
+app.delete("/delete", async (c) => {
+  const { searchParams } = new URL(c.req.url);
+  const netId = searchParams.get("netId");
+  const bombId = searchParams.get("bombId");
+  if (!netId || !bombId) {
+    throw new HTTPException(400, { message: "Missing parameters" });
+  }
+
+  const db = drizzle(c.env.DB, { schema });
+  const res = await db
+    .delete(schema.bombs)
+    .where(
+      and(eq(schema.bombs.id, parseInt(bombId)), eq(schema.bombs.netId, netId))
+    )
+    .returning({ id: schema.bombs.id })
+    .get();
+
+  if (!res) {
+    throw new HTTPException(400, { message: "Invalid bombId or netId" });
+  }
+
+  return c.text(res.id.toString());
+});
+
+app.delete("/reset", async (c) => {
+  const db = drizzle(c.env.DB, { schema });
+  await db.delete(schema.bombs);
+  await db.delete(schema.defuses);
+  await db.delete(schema.explosions);
+
+  return c.text("OK");
+});
+
+app.get("/migrate", async (c) => {
+  const db = drizzle(c.env.DB, { schema });
+  await db.run(sql`
+    CREATE TABLE IF NOT EXISTS bombs (
+      id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+      netId TEXT NOT NULL,
+      time INTEGER NOT NULL,
+      defused INTEGER DEFAULT 0 NOT NULL,
+      explosions INTEGER DEFAULT 0 NOT NULL,
+      score REAL DEFAULT 0 NOT NULL
+    );
+  `);
+  await db.run(sql`
+    CREATE TABLE IF NOT EXISTS defuses (
+      id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+      bombId INTEGER NOT NULL,
+      time INTEGER NOT NULL,
+      phase INTEGER NOT NULL,
+      response TEXT NOT NULL
+    );
+  `);
+  await db.run(sql`
+    CREATE TABLE IF NOT EXISTS explosions (
+      id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+      bombId INTEGER NOT NULL,
+      time INTEGER NOT NULL,
+      phase INTEGER NOT NULL,
+      response TEXT NOT NULL
+    );
+  `);
+
+  return c.text("OK");
+});
+
+export default app;
