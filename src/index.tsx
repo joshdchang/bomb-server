@@ -15,7 +15,7 @@ app.get("*", renderer);
 
 app.get("/", async (c) => {
   const db = drizzle(c.env.DB, { schema });
-
+  
   const bombs = await db.query.bombs.findMany({
     orderBy: (bombs, { desc, asc }) => [desc(bombs.score), asc(bombs.time)],
   });
@@ -207,11 +207,11 @@ app.get("/submit", async (c) => {
       })
       .where(eq(schema.bombs.id, bombId));
 
-    await db.insert(schema.defuses).values({
+    c.executionCtx.waitUntil(db.insert(schema.defuses).values({
       bombId,
       response,
       phase,
-    });
+    }));
 
     return c.text("OK");
   } else if (action === "exploded") {
@@ -224,11 +224,11 @@ app.get("/submit", async (c) => {
       })
       .where(eq(schema.bombs.id, bombId));
 
-    await db.insert(schema.explosions).values({
+    c.executionCtx.waitUntil(db.insert(schema.explosions).values({
       bombId,
       phase,
       response,
-    });
+    }));
 
     return c.text("OK");
   } else {
