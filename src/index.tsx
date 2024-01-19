@@ -13,6 +13,7 @@ const app = new Hono<{ Bindings: Bindings }>();
 
 app.get("*", renderer);
 
+// TODO add mobile styles and favicon
 app.get("/", async (c) => {
   const db = drizzle(c.env.DB, { schema });
   
@@ -157,7 +158,7 @@ app.get("/", async (c) => {
   );
 });
 
-app.get("/submit", async (c) => {
+app.post("/submit", async (c) => {
   const { searchParams } = new URL(c.req.url);
   const netId = searchParams.get("netId");
   const result = searchParams.get("result");
