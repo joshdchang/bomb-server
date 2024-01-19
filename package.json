@@ -4,7 +4,6 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "wrangler pages dev dist",
-    "deploy": "$npm_execpath run build && wrangler pages deploy dist",
     "generate": "drizzle-kit generate:sqlite",
     "studio": "drizzle-kit studio"
   },

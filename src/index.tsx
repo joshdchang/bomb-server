@@ -194,7 +194,7 @@ app.get("/submit", async (c) => {
       throw new HTTPException(400, { message: "Missing response" });
     }
 
-    if (phase !== current.phase + 1) {
+    if (phase !== current.phase + 1 || phase > 10) {
       throw new HTTPException(400, { message: "Invalid phase" });
     }
 

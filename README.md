@@ -1,8 +1,8 @@
-```txt
-npm install
-npm run dev
+# Bomb Lab Server for Yale CPSC 323
+
+```bash
+pnpm install
+pnpm run dev
 ```
 
-```txt
-npm run deploy
-```
+## TODO: Document the API and the project structure
