@@ -11,8 +11,8 @@ export const bombs = sqliteTable("bombs", {
   score: real("score").default(0).notNull(),
 });
 
-export type Bomb = typeof bombs.$inferSelect; // return type when queried
-export type InsertBomb = typeof bombs.$inferInsert; // insert type
+export type Bomb = typeof bombs.$inferSelect;
+export type InsertBomb = typeof bombs.$inferInsert;
 
 export const defuses = sqliteTable("defuses", {
   id: integer("id", { mode: "number" }).primaryKey({ autoIncrement: true }),
@@ -24,8 +24,8 @@ export const defuses = sqliteTable("defuses", {
   response: text("response").notNull(),
 });
 
-export type Defuse = typeof defuses.$inferSelect; // return type when queried
-export type InsertDefuse = typeof defuses.$inferInsert; // insert type
+export type Defuse = typeof defuses.$inferSelect;
+export type InsertDefuse = typeof defuses.$inferInsert;
 
 export const explosions = sqliteTable("explosions", {
   id: integer("id", { mode: "number" }).primaryKey({ autoIncrement: true }),
@@ -37,5 +37,5 @@ export const explosions = sqliteTable("explosions", {
   response: text("response").notNull(),
 });
 
-export type Explosion = typeof explosions.$inferSelect; // return type when queried
-export type InsertExplosion = typeof explosions.$inferInsert; // insert type
+export type Explosion = typeof explosions.$inferSelect;
+export type InsertExplosion = typeof explosions.$inferInsert;
