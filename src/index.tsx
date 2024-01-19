@@ -288,7 +288,7 @@ app.delete("/reset", async (c) => {
   return c.text("OK");
 });
 
-app.get("/migrate", async (c) => {
+app.get("/init-db", async (c) => {
   const db = drizzle(c.env.DB, { schema });
   await db.run(sql`
     CREATE TABLE IF NOT EXISTS bombs (
