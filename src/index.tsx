@@ -54,14 +54,7 @@ app.get("/", async (c) => {
         <div class="w-1/2 leading-normal text-slate-600">
           This page contains the latest information that we have received from
           your bomb. If you have any questions, please contact the course staff
-          at{" "}
-          <a
-            href="mailto:example@example.com"
-            class="text-blue-500 underline underline-offset-2 hover:text-blue-600"
-          >
-            example@example.com
-          </a>
-          .
+          on Ed Discussion.
         </div>
       </div>
       {/* podium */}
