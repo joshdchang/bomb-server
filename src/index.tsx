@@ -379,9 +379,4 @@ app.get("/explosions.json", async (c) => {
   return c.json(explosions);
 });
 
-app.get("/check-password", (c) => {
-  checkPassword(c);
-  return c.text("OK");
-});
-
 export default app;
