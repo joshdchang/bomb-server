@@ -1,4 +1,4 @@
-import { Hono } from "hono";
+import { Context, Hono } from "hono";
 import { renderer } from "./renderer";
 import { drizzle } from "drizzle-orm/d1";
 import * as schema from "./schema";
@@ -7,16 +7,28 @@ import { and, eq, sql } from "drizzle-orm";
 
 type Bindings = {
   DB: D1Database;
+  PASSWORD: string;
 };
 
 const app = new Hono<{ Bindings: Bindings }>();
+
+function checkPassword(c: Context<{ Bindings: Bindings }>) {
+  const { searchParams } = new URL(c.req.url);
+  const password = searchParams.get("password");
+  if (!password) {
+    throw new HTTPException(400, { message: "Missing password" });
+  }
+  if (password !== c.env.PASSWORD) {
+    throw new HTTPException(400, { message: "Invalid password" });
+  }
+}
 
 app.get("*", renderer);
 
 // TODO add mobile styles and favicon
 app.get("/", async (c) => {
   const db = drizzle(c.env.DB, { schema });
-  
+
   const bombs = await db.query.bombs.findMany({
     orderBy: (bombs, { desc, asc }) => [desc(bombs.score), asc(bombs.time)],
   });
@@ -162,8 +174,9 @@ app.post("/submit", async (c) => {
   const { searchParams } = new URL(c.req.url);
   const netId = searchParams.get("netId");
   const result = searchParams.get("result");
+  const secret = searchParams.get("secret");
 
-  if (!netId || !result) {
+  if (!netId || !result || !secret) {
     throw new HTTPException(400, { message: "Missing parameters" });
   }
 
@@ -189,6 +202,9 @@ app.post("/submit", async (c) => {
   if (current.netId !== netId) {
     throw new HTTPException(400, { message: "Invalid netId" });
   }
+  if (current.secret !== secret) {
+    throw new HTTPException(400, { message: "Invalid secret" });
+  }
 
   if (action === "defused") {
     if (!response) {
@@ -208,11 +224,13 @@ app.post("/submit", async (c) => {
       })
       .where(eq(schema.bombs.id, bombId));
 
-    c.executionCtx.waitUntil(db.insert(schema.defuses).values({
-      bombId,
-      response,
-      phase,
-    }));
+    c.executionCtx.waitUntil(
+      db.insert(schema.defuses).values({
+        bombId,
+        response,
+        phase,
+      })
+    );
 
     return c.text("OK");
   } else if (action === "exploded") {
@@ -225,11 +243,13 @@ app.post("/submit", async (c) => {
       })
       .where(eq(schema.bombs.id, bombId));
 
-    c.executionCtx.waitUntil(db.insert(schema.explosions).values({
-      bombId,
-      phase,
-      response,
-    }));
+    c.executionCtx.waitUntil(
+      db.insert(schema.explosions).values({
+        bombId,
+        phase,
+        response,
+      })
+    );
 
     return c.text("OK");
   } else {
@@ -240,16 +260,19 @@ app.post("/submit", async (c) => {
 app.all("/ping", (c) => c.text("pong"));
 
 app.post("/create", async (c) => {
+  checkPassword(c);
+
   const { searchParams } = new URL(c.req.url);
   const netId = searchParams.get("netId");
-  if (!netId) {
-    throw new HTTPException(400, { message: "Missing netId" });
+  const secret = searchParams.get("secret");
+  if (!netId || !secret) {
+    throw new HTTPException(400, { message: "Missing netId or secret" });
   }
 
   const db = drizzle(c.env.DB, { schema });
   const res = await db
     .insert(schema.bombs)
-    .values({ netId })
+    .values({ netId, secret })
     .returning({ id: schema.bombs.id })
     .get();
 
@@ -257,6 +280,8 @@ app.post("/create", async (c) => {
 });
 
 app.delete("/delete", async (c) => {
+  checkPassword(c);
+
   const { searchParams } = new URL(c.req.url);
   const netId = searchParams.get("netId");
   const bombId = searchParams.get("bombId");
@@ -281,28 +306,27 @@ app.delete("/delete", async (c) => {
 });
 
 app.delete("/reset", async (c) => {
-  const db = drizzle(c.env.DB, { schema });
-  await db.delete(schema.bombs);
-  await db.delete(schema.defuses);
-  await db.delete(schema.explosions);
+  checkPassword(c);
 
-  return c.text("OK");
-});
-
-app.get("/init-db", async (c) => {
   const db = drizzle(c.env.DB, { schema });
+
+  await db.run(sql`DROP TABLE IF EXISTS bombs;`);
+  await db.run(sql`DROP TABLE IF EXISTS defuses;`);
+  await db.run(sql`DROP TABLE IF EXISTS explosions;`);
+
   await db.run(sql`
-    CREATE TABLE IF NOT EXISTS bombs (
+    CREATE TABLE bombs (
       id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
       netId TEXT NOT NULL,
       time INTEGER NOT NULL,
       defused INTEGER DEFAULT 0 NOT NULL,
       explosions INTEGER DEFAULT 0 NOT NULL,
-      score REAL DEFAULT 0 NOT NULL
+      score REAL DEFAULT 0 NOT NULL,
+      secret TEXT NOT NULL
     );
   `);
   await db.run(sql`
-    CREATE TABLE IF NOT EXISTS defuses (
+    CREATE TABLE defuses (
       id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
       bombId INTEGER NOT NULL,
       time INTEGER NOT NULL,
@@ -311,7 +335,7 @@ app.get("/init-db", async (c) => {
     );
   `);
   await db.run(sql`
-    CREATE TABLE IF NOT EXISTS explosions (
+    CREATE TABLE explosions (
       id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
       bombId INTEGER NOT NULL,
       time INTEGER NOT NULL,

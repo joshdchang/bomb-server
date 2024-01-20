@@ -9,6 +9,7 @@ export const bombs = sqliteTable("bombs", {
   phase: integer("defused", { mode: "number" }).default(0).notNull(),
   explosions: integer("explosions", { mode: "number" }).default(0).notNull(),
   score: real("score").default(0).notNull(),
+  secret: text("secret").notNull(),
 });
 
 export type Bomb = typeof bombs.$inferSelect;
