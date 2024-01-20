@@ -250,12 +250,13 @@ app.post("/submit", async (c) => {
 
   const db = drizzle(c.env.DB, { schema });
 
-  console.log(result);
-
   const pieces = result.split(":");
 
-  if (pieces.length !== 4) {
+  if (pieces.length < 4) {
     throw new HTTPException(400, { message: "Invalid result" });
+  }
+  if (pieces.length > 4) {
+    pieces[3] = pieces.slice(3).join(":");
   }
 
   const [bombIdStr, action, phaseStr, response] = pieces;
