@@ -347,4 +347,40 @@ app.delete("/reset", async (c) => {
   return c.text("OK");
 });
 
+app.get("/scores.json", async (c) => {
+  checkPassword(c);
+
+  const db = drizzle(c.env.DB, { schema });
+
+  const bombs = await db.query.bombs.findMany({
+    orderBy: (bombs, { desc, asc }) => [desc(bombs.score), asc(bombs.time)],
+  });
+
+  return c.json(bombs);
+});
+
+app.get("/defuses.json", async (c) => {
+  checkPassword(c);
+
+  const db = drizzle(c.env.DB, { schema });
+
+  const defuses = await db.query.defuses.findMany({
+    orderBy: (defuses, { desc }) => desc(defuses.time),
+  });
+
+  return c.json(defuses);
+});
+
+app.get("/explosions.json", async (c) => {
+  checkPassword(c);
+
+  const db = drizzle(c.env.DB, { schema });
+
+  const explosions = await db.query.explosions.findMany({
+    orderBy: (explosions, { desc }) => desc(explosions.time),
+  });
+
+  return c.json(explosions);
+});
+
 export default app;
