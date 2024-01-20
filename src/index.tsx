@@ -140,14 +140,14 @@ app.get("/", async (c) => {
                     </div>
                   )}
                   <div class="text-base text-slate-400">
-                    {bomb.time.toLocaleString("en-US", {
+                    {(bomb.phase > 0 || bomb.explosions > 0 || bomb.score !== 0) ? bomb.time.toLocaleString("en-US", {
                       day: "numeric",
                       month: "short",
                       hour12: true,
                       hour: "numeric",
                       minute: "numeric",
                       timeZone: "America/New_York",
-                    })}
+                    }) : "--"}
                   </div>
                 </div>
                 <div class="flex items-center gap-4">
