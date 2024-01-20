@@ -33,9 +33,33 @@ app.get("/", async (c) => {
     orderBy: (bombs, { desc, asc }) => [desc(bombs.score), asc(bombs.time)],
   });
 
-  const first = bombs[0] as schema.Bomb | undefined;
-  const second = bombs[1] as schema.Bomb | undefined;
-  const third = bombs[2] as schema.Bomb | undefined;
+  let first = bombs[0] as schema.Bomb | undefined;
+  if (
+    first &&
+    first.score === 0 &&
+    first.explosions === 0 &&
+    first.phase === 0
+  ) {
+    first = undefined;
+  }
+  let second = bombs[1] as schema.Bomb | undefined;
+  if (
+    second &&
+    second.score === 0 &&
+    second.explosions === 0 &&
+    second.phase === 0
+  ) {
+    second = undefined;
+  }
+  let third = bombs[2] as schema.Bomb | undefined;
+  if (
+    third &&
+    third.score === 0 &&
+    third.explosions === 0 &&
+    third.phase === 0
+  ) {
+    third = undefined;
+  }
 
   const { searchParams } = new URL(c.req.url);
   const showNetIds = searchParams.get("netid") === "true";
@@ -68,12 +92,17 @@ app.get("/", async (c) => {
             2
           </div>
           <div class="flex items-center justify-center text-2xl text-slate-100 flex-col gap-3">
-            {second ? "bomb" + second.id : "--"}
-            {showNetIds && (
-              <span class="text-base text-slate-400">
-                {second ? second.netId : "--"}
-              </span>
-            )}
+            <span>{second ? "bomb" + second.id : "--"}</span>
+            {second &&
+              (showNetIds ? (
+                <span class="text-base text-slate-400">
+                  {second.netId} ({second.score} points)
+                </span>
+              ) : (
+                <span class="text-base text-slate-400">
+                  {second.score} points
+                </span>
+              ))}
           </div>
         </div>
         {/* first */}
@@ -82,12 +111,17 @@ app.get("/", async (c) => {
             1
           </div>
           <div class="flex items-center justify-center text-2xl text-slate-100 flex-col gap-3">
-            {first ? "bomb" + first.id : "--"}
-            {showNetIds && (
-              <span class="text-base text-slate-400">
-                {first ? first.netId : "--"}
-              </span>
-            )}
+            <span>{first ? "bomb" + first.id : "--"}</span>
+            {first &&
+              (showNetIds ? (
+                <span class="text-base text-slate-400">
+                  {first.netId} ({first.score} points)
+                </span>
+              ) : (
+                <span class="text-base text-slate-400">
+                  {first.score} points
+                </span>
+              ))}
           </div>
         </div>
         {/* third */}
@@ -96,12 +130,17 @@ app.get("/", async (c) => {
             3
           </div>
           <div class="flex items-center justify-center text-2xl text-slate-100 flex-col gap-3">
-            {third ? "bomb" + third.id : "--"}
-            {showNetIds && (
-              <span class="text-base text-slate-400">
-                {third ? third.netId : "--"}
-              </span>
-            )}
+            <span>{third ? "bomb" + third.id : "--"}</span>
+            {third &&
+              (showNetIds ? (
+                <span class="text-base text-slate-400">
+                  {third.netId} ({third.score} points)
+                </span>
+              ) : (
+                <span class="text-base text-slate-400">
+                  {third.score} points
+                </span>
+              ))}
           </div>
         </div>
       </div>
