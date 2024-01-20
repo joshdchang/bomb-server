@@ -224,13 +224,11 @@ app.post("/submit", async (c) => {
       })
       .where(eq(schema.bombs.id, bombId));
 
-    c.executionCtx.waitUntil(
-      db.insert(schema.defuses).values({
-        bombId,
-        response,
-        phase,
-      })
-    );
+    await db.insert(schema.defuses).values({
+      bombId,
+      response,
+      phase,
+    });
 
     return c.text("OK");
   } else if (action === "exploded") {
@@ -243,13 +241,11 @@ app.post("/submit", async (c) => {
       })
       .where(eq(schema.bombs.id, bombId));
 
-    c.executionCtx.waitUntil(
-      db.insert(schema.explosions).values({
-        bombId,
-        phase,
-        response,
-      })
-    );
+    await db.insert(schema.explosions).values({
+      bombId,
+      phase,
+      response,
+    });
 
     return c.text("OK");
   } else {
