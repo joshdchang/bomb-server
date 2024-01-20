@@ -54,7 +54,7 @@ app.get("/", async (c) => {
         <div class="w-1/2 leading-normal text-slate-600">
           This page contains the latest information that we have received from
           your bomb. If you have any questions, please contact the course staff
-          on Ed Discussion.
+          on Ed Discussion or by email.
         </div>
       </div>
       {/* podium */}
