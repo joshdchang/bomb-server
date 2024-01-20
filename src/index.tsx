@@ -283,7 +283,7 @@ app.post("/submit", async (c) => {
     }
 
     console.log(current.phase, phase);
-    if (phase !== current.phase + 1 || phase > 11) {
+    if (phase !== current.phase + 1 || phase > 10) {
       throw new HTTPException(400, { message: "Invalid phase" });
     }
 
