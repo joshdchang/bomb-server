@@ -250,6 +250,8 @@ app.post("/submit", async (c) => {
 
   const db = drizzle(c.env.DB, { schema });
 
+  console.log(result);
+
   const pieces = result.split(":");
 
   if (pieces.length !== 4) {
