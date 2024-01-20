@@ -37,6 +37,9 @@ app.get("/", async (c) => {
   const second = bombs[1] as schema.Bomb | undefined;
   const third = bombs[2] as schema.Bomb | undefined;
 
+  const { searchParams } = new URL(c.req.url);
+  const showNetIds = searchParams.get("netid") === "true";
+
   return c.render(
     <>
       {/* header */}
@@ -64,8 +67,13 @@ app.get("/", async (c) => {
           <div class="flex items-center justify-center bg-rose-500/80 text-5xl font-bold text-slate-50">
             2
           </div>
-          <div class="flex items-center justify-center text-2xl text-slate-100">
+          <div class="flex items-center justify-center text-2xl text-slate-100 flex-col gap-3">
             {second ? "bomb" + second.id : "--"}
+            {showNetIds && (
+              <span class="text-base text-slate-400">
+                {second ? second.netId : "--"}
+              </span>
+            )}
           </div>
         </div>
         {/* first */}
@@ -73,8 +81,13 @@ app.get("/", async (c) => {
           <div class="flex items-center justify-center bg-rose-500/80 text-5xl font-bold text-slate-50">
             1
           </div>
-          <div class="flex items-center justify-center text-2xl text-slate-100">
+          <div class="flex items-center justify-center text-2xl text-slate-100 flex-col gap-3">
             {first ? "bomb" + first.id : "--"}
+            {showNetIds && (
+              <span class="text-base text-slate-400">
+                {first ? first.netId : "--"}
+              </span>
+            )}
           </div>
         </div>
         {/* third */}
@@ -82,8 +95,13 @@ app.get("/", async (c) => {
           <div class="flex items-center justify-center bg-rose-500/80 text-5xl font-bold text-slate-50">
             3
           </div>
-          <div class="flex items-center justify-center text-2xl text-slate-100">
+          <div class="flex items-center justify-center text-2xl text-slate-100 flex-col gap-3">
             {third ? "bomb" + third.id : "--"}
+            {showNetIds && (
+              <span class="text-base text-slate-400">
+                {third ? third.netId : "--"}
+              </span>
+            )}
           </div>
         </div>
       </div>
@@ -91,9 +109,18 @@ app.get("/", async (c) => {
       {bombs.length > 0 ? (
         <div class="grid gap-2 px-16 pb-16 pt-4">
           <div class="flex items-center justify-between gap-3 px-1 text-lg text-slate-50">
-            <div class="grid grid-cols-[6rem_9rem_9rem_12rem_16rem] items-center">
+            <div
+              class={
+                showNetIds
+                  ? "grid grid-cols-[6rem_9rem_10rem_9rem_12rem_16rem] items-center"
+                  : "grid grid-cols-[6rem_9rem_9rem_12rem_16rem] items-center"
+              }
+            >
               <div class="text-2xl font-medium text-slate-600">#</div>
               <div class="text-lg font-medium text-slate-600">Bomb</div>
+              {showNetIds && (
+                <div class="text-lg font-medium text-slate-600">NetID</div>
+              )}
               <div class="text-lg font-medium text-slate-600">Phase</div>
               <div class="text-lg font-medium text-slate-600">Explosions</div>
               <div class="text-lg font-medium text-slate-600">
@@ -111,11 +138,18 @@ app.get("/", async (c) => {
                 id={"bomb" + bomb.id}
                 class="flex items-center justify-between gap-3 px-1 py-1 text-lg text-slate-50"
               >
-                <div class="grid grid-cols-[6rem_9rem_9rem_12rem_16rem] items-center">
+                <div
+                  class={
+                    showNetIds
+                      ? "grid grid-cols-[6rem_9rem_10rem_9rem_12rem_16rem] items-center"
+                      : "grid grid-cols-[6rem_9rem_9rem_12rem_16rem] items-center"
+                  }
+                >
                   <div class="text-3xl font-bold text-slate-500">
                     {index + 1}
                   </div>
                   <div>bomb{bomb.id}</div>
+                  {showNetIds && <div class="text-slate-400">{bomb.netId}</div>}
                   <div class="flex items-center gap-1 font-medium">
                     {bomb.phase === 10 ? (
                       <span class="text-green-400">10</span>
@@ -133,14 +167,16 @@ app.get("/", async (c) => {
                     </div>
                   )}
                   <div class="text-base text-slate-400">
-                    {(bomb.phase > 0 || bomb.explosions > 0 || bomb.score !== 0) ? bomb.time.toLocaleString("en-US", {
-                      day: "numeric",
-                      month: "short",
-                      hour12: true,
-                      hour: "numeric",
-                      minute: "numeric",
-                      timeZone: "America/New_York",
-                    }) : "--"}
+                    {bomb.phase > 0 || bomb.explosions > 0 || bomb.score !== 0
+                      ? bomb.time.toLocaleString("en-US", {
+                          day: "numeric",
+                          month: "short",
+                          hour12: true,
+                          hour: "numeric",
+                          minute: "numeric",
+                          timeZone: "America/New_York",
+                        })
+                      : "--"}
                   </div>
                 </div>
                 <div class="flex items-center gap-4">
