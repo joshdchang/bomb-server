@@ -27,7 +27,6 @@ app.get("*", renderer);
 
 // TODO add mobile styles and favicon
 app.get("/", async (c) => {
-  c.res.headers.set("Cache-Control", "s-maxage=2, stale-while-revalidate");
 
   const db = drizzle(c.env.DB, { schema });
 
