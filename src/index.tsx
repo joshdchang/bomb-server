@@ -44,6 +44,7 @@ async function clearCache(c: Context<{ Bindings: Bindings }>) {
         }),
       }
     );
+    console.log("Cleared cache");
   } catch (e) {
     console.log(e);
   }
