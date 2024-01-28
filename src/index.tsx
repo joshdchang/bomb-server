@@ -8,6 +8,9 @@ import { and, eq, sql } from "drizzle-orm";
 type Bindings = {
   DB: D1Database;
   PASSWORD: string;
+  CACHE_PURGE_TOKEN: string;
+  CACHE_DOMAIN: string;
+  CACHE_ZONE: string;
 };
 
 const app = new Hono<{ Bindings: Bindings }>();
@@ -24,15 +27,26 @@ function checkPassword(c: Context<{ Bindings: Bindings }>) {
 }
 
 async function clearCache(c: Context<{ Bindings: Bindings }>) {
-  const cache = caches.default;
-  const cacheUrl = new URL("/", c.req.url);
-  console.log("clearing cache", cacheUrl);
-  const req = new Request(cacheUrl, {
-    method: "GET",
-  });
-  const result = await cache.delete(req);
-  console.log("cache cleared", result);
-  return result;
+  if (!c.env.CACHE_PURGE_TOKEN || !c.env.CACHE_DOMAIN || !c.env.CACHE_ZONE) {
+    return;
+  }
+  try {
+    await fetch(
+      `https://api.cloudflare.com/client/v4/zones/${c.env.CACHE_ZONE}/purge_cache`,
+      {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${c.env.CACHE_PURGE_TOKEN}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          files: [`https://${c.env.CACHE_DOMAIN}/`],
+        }),
+      }
+    );
+  } catch (e) {
+    console.log(e);
+  }
 }
 
 app.get("*", renderer);
