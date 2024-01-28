@@ -25,9 +25,9 @@ function checkPassword(c: Context<{ Bindings: Bindings }>) {
 
 async function clearCache(c: Context<{ Bindings: Bindings }>) {
   const cache = caches.default;
-  // const cacheUrl = new URL("/", c.req.url);
-  // console.log("clearing cache", cacheUrl);
-  const req = new Request("/", {
+  const cacheUrl = new URL("/", c.req.url);
+  console.log("clearing cache", cacheUrl);
+  const req = new Request(cacheUrl, {
     method: "GET",
   });
   const result = await cache.delete(req);
