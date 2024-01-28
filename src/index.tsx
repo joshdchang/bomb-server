@@ -23,17 +23,16 @@ function checkPassword(c: Context<{ Bindings: Bindings }>) {
   }
 }
 
-function clearCache(c: Context<{ Bindings: Bindings }>) {
+async function clearCache(c: Context<{ Bindings: Bindings }>) {
   const cache = caches.default;
   const cacheUrl = new URL("/", c.req.url);
-  const result = cache.delete(cacheUrl);
+  const result = await cache.delete(cacheUrl);
   console.log("cache cleared", result);
   return result;
 }
 
 app.get("*", renderer);
 
-// TODO add mobile styles and favicon
 app.get("/", async (c) => {
   const db = drizzle(c.env.DB, { schema });
 
@@ -342,7 +341,7 @@ app.post("/submit", async (c) => {
       phase,
     });
 
-    clearCache(c);
+    await clearCache(c);
 
     return c.text("OK");
   } else if (action === "exploded") {
@@ -361,7 +360,7 @@ app.post("/submit", async (c) => {
       response,
     });
 
-    clearCache(c);
+    await clearCache(c);
 
     return c.text("OK");
   } else {
@@ -388,7 +387,7 @@ app.post("/create", async (c) => {
     .returning({ id: schema.bombs.id })
     .get();
 
-  clearCache(c);
+  await clearCache(c);
 
   return c.text(res.id.toString());
 });
@@ -416,7 +415,7 @@ app.delete("/delete", async (c) => {
     throw new HTTPException(400, { message: "Invalid bombId or netId" });
   }
 
-  clearCache(c);
+  await clearCache(c);
 
   return c.text(res.id.toString());
 });
@@ -460,7 +459,7 @@ app.delete("/reset", async (c) => {
     );
   `);
 
-  clearCache(c);
+  await clearCache(c);
 
   return c.text("OK");
 });
