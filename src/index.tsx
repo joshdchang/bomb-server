@@ -4,6 +4,7 @@ import { drizzle } from "drizzle-orm/d1";
 import * as schema from "./schema";
 import { HTTPException } from "hono/http-exception";
 import { and, eq, sql } from "drizzle-orm";
+import { cache } from "hono/cache";
 
 type Bindings = {
   DB: D1Database;
@@ -13,6 +14,7 @@ type Bindings = {
 const app = new Hono<{ Bindings: Bindings }>();
 
 function checkPassword(c: Context<{ Bindings: Bindings }>) {
+
   const { searchParams } = new URL(c.req.url);
   const password = searchParams.get("password");
   if (!password) {
@@ -27,6 +29,9 @@ app.get("*", renderer);
 
 // TODO add mobile styles and favicon
 app.get("/", async (c) => {
+
+  c.res.headers.set("Cache-Control", "s-maxage=1, stale-while-revalidate");
+
   const db = drizzle(c.env.DB, { schema });
 
   const bombs = await db.query.bombs.findMany({
@@ -233,6 +238,32 @@ app.get("/", async (c) => {
           No bombs have been created yet.
         </div>
       )}
+      <div class="flex items-center justify-between gap-3 px-16 py-6 border-t border-t-slate-700 bg-slate-900/30 text-slate-400 text-sm">
+        <div>
+          Bomb Lab Server by{" "}
+          <a
+            href="https://github.com/joshdchang"
+            target="_blank"
+            class="text-rose-500 hover:text-rose-400 underline underline-offset-2"
+          >
+            Josh Chang
+          </a>
+        </div>
+        <div>
+          Last updated:{" "}<span class="text-slate-500">{new Date().toLocaleString("en-US", {
+            day: "numeric",
+            month: "short",
+            hour12: true,
+            hour: "numeric",
+            minute: "numeric",
+            second: "numeric",
+            timeZone: "America/New_York",
+          })}</span>
+        </div>
+        <div>
+          &copy; {new Date().getFullYear()}{" "} Yale University
+        </div>
+      </div>
     </>,
     { title: "CPSC 323 | Bomb Lab Scoreboard" }
   );
