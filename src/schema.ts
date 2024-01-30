@@ -15,7 +15,7 @@ export const bombs = sqliteTable("bombs", {
 export type Bomb = typeof bombs.$inferSelect;
 export type InsertBomb = typeof bombs.$inferInsert;
 
-export const defuses = sqliteTable("defuses", {
+export const defusals = sqliteTable("defusals", {
   id: integer("id", { mode: "number" }).primaryKey({ autoIncrement: true }),
   bombId: integer("bombId", { mode: "number" }).notNull(),
   time: integer("time", { mode: "timestamp" })
@@ -25,8 +25,8 @@ export const defuses = sqliteTable("defuses", {
   response: text("response").notNull(),
 });
 
-export type Defuse = typeof defuses.$inferSelect;
-export type InsertDefuse = typeof defuses.$inferInsert;
+export type Defuse = typeof defusals.$inferSelect;
+export type InsertDefuse = typeof defusals.$inferInsert;
 
 export const explosions = sqliteTable("explosions", {
   id: integer("id", { mode: "number" }).primaryKey({ autoIncrement: true }),
