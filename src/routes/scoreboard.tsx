@@ -67,7 +67,7 @@ export async function scoreboard(c: C) {
   const showNetIds = searchParams.get("netid") === "true";
 
   const cols = showNetIds
-    ? "grid md:grid-cols-[4rem_6rem_6rem_7rem_10rem_12rem] lg:grid-cols-[6rem_9rem_10rem_9rem_12rem_15rem] items-center"
+    ? "grid grid-cols-[2rem_3.5rem_4rem_4rem_6rem_7rem] sm:grid-cols-[3rem_5rem_6rem_6rem_8rem_9rem] md:grid-cols-[4rem_6rem_7rem_7rem_10rem_12rem] lg:grid-cols-[6rem_9rem_10rem_9rem_12rem_15rem] items-center"
     : "grid grid-cols-[2rem_3.5rem_4rem_6rem_7rem] sm:grid-cols-[3rem_5rem_6rem_8rem_9rem] md:grid-cols-[4rem_6rem_7rem_10rem_12rem] lg:grid-cols-[6rem_9rem_9rem_12rem_15rem] items-center";
 
   // render the scoreboard page UI
