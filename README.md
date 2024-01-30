@@ -15,7 +15,8 @@ This server is written in TypeScript using a web framework called [Hono](https:/
 ## Directory Structure
 
 - `src/`: TypeScript source code
-  - `index.tsx`: main entry point with routing
+  - `index.ts`: main entry point with routing
+  - `routes/`: route handlers (see comments in the files for more information)
   - `render.tsx`: common rendering function for graphical pages
   - `schema.ts`: drizzle database schema
   - `styles.css`: global styles (just includes Tailwind)
@@ -37,7 +38,7 @@ Pre-requisites: [Node.js](https://nodejs.org/en), [pnpm](https://pnpm.io/)
 
 ```bash
 pnpm install
-pnpm run dev
+pnpm dev
 curl -X DELETE -H "Authorization: Bearer <ADMIN_PASSWORD>" http://localhost:5173/reset
 ```
 

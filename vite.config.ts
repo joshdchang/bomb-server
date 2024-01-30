@@ -8,7 +8,7 @@ export default defineConfig({
   plugins: [
     pages(),
     devServer({
-      entry: "src/index.tsx",
+      entry: "src/index.ts",
       env: getEnv({
         d1Databases: ["DB"],
         d1Persist: true,
