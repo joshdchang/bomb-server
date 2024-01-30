@@ -1,9 +1,10 @@
 import { sql } from "drizzle-orm";
 import { C } from "..";
-import { checkAuth, clearCache } from "../utils";
+import { checkAuth, clearScoreboardCache } from "../utils";
 import { drizzle } from "drizzle-orm/d1";
 import * as schema from "../schema";
 
+// resets the database by dropping all tables and recreating them (also functions as a way to create the tables if they don't exist yet)
 export async function reset(c: C) {
   checkAuth(c);
 
@@ -43,7 +44,7 @@ export async function reset(c: C) {
     );
   `);
 
-  await clearCache(c);
+  await clearScoreboardCache(c);
 
   return c.text("OK");
 }

@@ -1,10 +1,11 @@
-import { checkAuth, clearCache } from "../utils";
+import { checkAuth, clearScoreboardCache } from "../utils";
 import { C } from "..";
 import { HTTPException } from "hono/http-exception";
 import { drizzle } from "drizzle-orm/d1";
 import * as schema from "../schema";
 import { and, eq } from "drizzle-orm";
 
+// deletes a bomb
 export async function deleteBomb(c: C) {
   checkAuth(c);
 
@@ -28,7 +29,7 @@ export async function deleteBomb(c: C) {
     throw new HTTPException(400, { message: "Invalid bombId or netId" });
   }
 
-  await clearCache(c);
+  await clearScoreboardCache(c);
 
   return c.text(res.id.toString());
 }

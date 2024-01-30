@@ -3,6 +3,7 @@ import { checkAuth } from "../utils";
 import { drizzle } from "drizzle-orm/d1";
 import * as schema from "../schema";
 
+// scores.json route
 export async function score(c: C) {
   checkAuth(c);
 
@@ -14,6 +15,7 @@ export async function score(c: C) {
   return c.json(bombs);
 };
 
+// defusals.json route
 export async function defusal(c: C) {
   checkAuth(c);
 
@@ -25,6 +27,7 @@ export async function defusal(c: C) {
   return c.json(defusals);
 }
 
+// explosions.json route
 export async function explosion(c: C) {
   checkAuth(c);
 

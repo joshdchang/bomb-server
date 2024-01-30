@@ -1,6 +1,7 @@
 import { HTTPException } from "hono/http-exception";
 import { C } from ".";
 
+// checks the Authorization header for the correct admin password
 export function checkAuth(c: C) {
   const authorizationHeader = c.req.header("Authorization");
   if (!authorizationHeader) {
@@ -12,7 +13,8 @@ export function checkAuth(c: C) {
   }
 }
 
-export async function clearCache(c: C) {
+// requests the Cloudflare API to clear the cache for the scoreboard
+export async function clearScoreboardCache(c: C) {
   if (!c.env.CACHE_PURGE_TOKEN || !c.env.CACHE_DOMAIN || !c.env.CACHE_ZONE) {
     return;
   }

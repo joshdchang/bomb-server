@@ -2,12 +2,14 @@ import "hono";
 import { jsxRenderer } from "hono/jsx-renderer";
 import style from "./style.css?inline";
 
+// some typing stuff
 declare module "hono" {
   interface ContextRenderer {
     (content: string | Promise<string>, props?: { title?: string }): Response;
   }
 }
 
+// boilerplate html renderer for jsx pages with tailwind
 export const renderer = jsxRenderer(
   ({ children, title }) => {
     return (

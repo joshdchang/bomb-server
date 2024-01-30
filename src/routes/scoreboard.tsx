@@ -2,6 +2,7 @@ import { drizzle } from "drizzle-orm/d1";
 import { C } from "..";
 import * as schema from "../schema";
 
+// main scoreboard page with the top 3 bombs and a table of all bombs
 export async function scoreboard(c: C) {
   // get the bombs from the database
   const db = drizzle(c.env.DB, { schema });

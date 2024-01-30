@@ -1,9 +1,10 @@
 import { drizzle } from "drizzle-orm/d1";
 import * as schema from "../schema";
-import { checkAuth, clearCache } from "../utils";
+import { checkAuth, clearScoreboardCache } from "../utils";
 import { HTTPException } from "hono/http-exception";
 import { C } from "..";
 
+// adds a bomb to the database and returns the bombId (for use by the generation script)
 export async function create(c: C) {
   checkAuth(c);
 
@@ -21,7 +22,7 @@ export async function create(c: C) {
     .returning({ id: schema.bombs.id })
     .get();
 
-  await clearCache(c);
+  await clearScoreboardCache(c);
 
   return c.text(res.id.toString());
 }

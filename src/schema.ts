@@ -1,3 +1,6 @@
+// This file is where the database schema is defined.
+// If you change it, make sure to update the schema in the reset route as well.
+
 import { text, integer, sqliteTable, real } from "drizzle-orm/sqlite-core";
 
 export const bombs = sqliteTable("bombs", {

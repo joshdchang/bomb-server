@@ -3,7 +3,7 @@ import { drizzle } from "drizzle-orm/d1";
 import * as schema from "../schema";
 import { eq } from "drizzle-orm";
 import { C } from "..";
-import { clearCache } from "../utils";
+import { clearScoreboardCache } from "../utils";
 
 export async function submit(c: C) {
   const { searchParams } = new URL(c.req.url);
@@ -69,7 +69,7 @@ export async function submit(c: C) {
       phase,
     });
 
-    await clearCache(c);
+    await clearScoreboardCache(c);
 
     return c.text("OK");
   } else if (action === "exploded") {
@@ -88,7 +88,7 @@ export async function submit(c: C) {
       response,
     });
 
-    await clearCache(c);
+    await clearScoreboardCache(c);
 
     return c.text("OK");
   } else {

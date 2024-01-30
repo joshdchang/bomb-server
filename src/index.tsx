@@ -7,7 +7,7 @@ import { deleteBomb } from "./routes/delete";
 import { reset } from "./routes/reset";
 import { defusal, explosion, score } from "./routes/results";
 
-// types
+// reusable types that allow environment variables to be strongly typed
 type Bindings = {
   DB: D1Database;
   ADMIN_PASSWORD: string;
