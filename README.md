@@ -42,6 +42,8 @@ pnpm dev
 curl -X DELETE -H "Authorization: Bearer <ADMIN_PASSWORD>" http://localhost:5173/reset
 ```
 
+The last curl command will initialize the database with the schema in `src/schema.ts` and clear all the data. Replace `<ADMIN_PASSWORD>` with the admin password set in the environment variables. You should have the development server running in one terminal and run the curl command in another terminal.
+
 ## Deployment
 
 This server is deployed on Cloudflare Workers. The code is written in JavaScript and is run on the V8 engine. The server is deployed using the `wrangler` CLI tool.

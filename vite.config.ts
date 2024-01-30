@@ -13,7 +13,7 @@ export default defineConfig({
         d1Databases: ["DB"],
         d1Persist: true,
         bindings: {
-          PASSWORD: process.env.PASSWORD!,
+          ADMIN_PASSWORD: process.env.ADMIN_PASSWORD!,
         },
       }),
     }),
