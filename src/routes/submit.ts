@@ -3,7 +3,6 @@ import { drizzle } from "drizzle-orm/d1";
 import * as schema from "../schema";
 import { eq } from "drizzle-orm";
 import { C } from "..";
-import { clearScoreboardCache } from "../utils";
 
 // This is the submit route. It is used to submit the results of a defusal or explosion. Called by the bomb executables.
 export async function submit(c: C) {
@@ -72,8 +71,6 @@ export async function submit(c: C) {
       phase,
     });
 
-    await clearScoreboardCache(c);
-
     return c.text("OK");
   } 
   // bomb claims to have exploded
@@ -93,8 +90,6 @@ export async function submit(c: C) {
       phase,
       response,
     });
-
-    await clearScoreboardCache(c);
 
     return c.text("OK");
   } else {

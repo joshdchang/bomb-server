@@ -11,9 +11,6 @@ import { defusal, explosion, score } from "./routes/results";
 type Bindings = {
   DB: D1Database;
   ADMIN_PASSWORD: string;
-  CACHE_PURGE_TOKEN: string;
-  CACHE_DOMAIN: string;
-  CACHE_ZONE: string;
 };
 export type C = Context<{ Bindings: Bindings }>;
 

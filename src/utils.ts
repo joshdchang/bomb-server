@@ -12,28 +12,3 @@ export function checkAuth(c: C) {
     throw new HTTPException(400, { message: "Invalid password" });
   }
 }
-
-// requests the Cloudflare API to clear the cache for the scoreboard
-export async function clearScoreboardCache(c: C) {
-  if (!c.env.CACHE_PURGE_TOKEN || !c.env.CACHE_DOMAIN || !c.env.CACHE_ZONE) {
-    return;
-  }
-  try {
-    await fetch(
-      `https://api.cloudflare.com/client/v4/zones/${c.env.CACHE_ZONE}/purge_cache`,
-      {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${c.env.CACHE_PURGE_TOKEN}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          files: [`https://${c.env.CACHE_DOMAIN}/`],
-        }),
-      }
-    );
-    console.log("Cleared cache");
-  } catch (e) {
-    console.log(e);
-  }
-}

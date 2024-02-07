@@ -1,6 +1,6 @@
 import { drizzle } from "drizzle-orm/d1";
 import * as schema from "../schema";
-import { checkAuth, clearScoreboardCache } from "../utils";
+import { checkAuth } from "../utils";
 import { HTTPException } from "hono/http-exception";
 import { C } from "..";
 
@@ -21,8 +21,6 @@ export async function create(c: C) {
     .values({ netId, secret })
     .returning({ id: schema.bombs.id })
     .get();
-
-  await clearScoreboardCache(c);
 
   return c.text(res.id.toString());
 }

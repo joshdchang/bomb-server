@@ -1,6 +1,6 @@
 import { sql } from "drizzle-orm";
 import { C } from "..";
-import { checkAuth, clearScoreboardCache } from "../utils";
+import { checkAuth } from "../utils";
 import { drizzle } from "drizzle-orm/d1";
 import * as schema from "../schema";
 
@@ -43,8 +43,6 @@ export async function reset(c: C) {
       response TEXT NOT NULL
     );
   `);
-
-  await clearScoreboardCache(c);
 
   return c.text("OK");
 }
