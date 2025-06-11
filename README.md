@@ -4,6 +4,8 @@ By [Josh Chang](https://github.com/joshdchang)
 
 January 2024
 
+See [https://bomb.joshchang.co/](https://bomb.joshchang.co/)
+
 ## Description
 
 This is the server for the Bomb Lab project for CPSC 323 at Yale University. It stores bomb defusals and explosions and displays the scores on a public scoreboard. It also has an API for the bomb to report its results and for administrative functions.
